@@ -247,11 +247,20 @@ struct Lurker::Impl
     virtual void Notice(
         Twitch::Messaging::NoticeInfo&& noticeInfo
     ) override {
-        diagnosticsSender.SendDiagnosticInformationFormatted(
-            3, "** Server NOTICE %s: %s **",
-            noticeInfo.id.c_str(),
-            noticeInfo.message.c_str()
-        );
+        if (noticeInfo.channel.empty()) {
+            diagnosticsSender.SendDiagnosticInformationFormatted(
+                3, "** Server NOTICE %s: %s **",
+                noticeInfo.id.c_str(),
+                noticeInfo.message.c_str()
+            );
+        } else {
+            diagnosticsSender.SendDiagnosticInformationFormatted(
+                3, "[%s] NOTICE %s: %s",
+                noticeInfo.channel.c_str(),
+                noticeInfo.id.c_str(),
+                noticeInfo.message.c_str()
+            );
+        }
     }
 
     virtual void Host(
