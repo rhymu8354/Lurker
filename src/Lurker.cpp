@@ -177,6 +177,10 @@ struct Lurker::Impl
 
     // Twitch::Messaging::User
 
+    virtual void Doom() override {
+        diagnosticsSender.SendDiagnosticInformationString(2, "** SERVER DISCONNECT IMMINENT **");
+    }
+
     virtual void LogIn() override {
         diagnosticsSender.SendDiagnosticInformationString(1, "Logged in.");
         for (const auto& channel: channelsToJoin) {
@@ -238,6 +242,157 @@ struct Lurker::Impl
             userDisplayName.c_str(),
             messageInfo.messageContent.c_str()
         );
+    }
+
+    virtual void Notice(
+        Twitch::Messaging::NoticeInfo&& noticeInfo
+    ) override {
+        diagnosticsSender.SendDiagnosticInformationFormatted(
+            1, "** Server NOTICE %s: %s **",
+            noticeInfo.id.c_str(),
+            noticeInfo.message.c_str()
+        );
+    }
+
+    virtual void Host(
+        Twitch::Messaging::HostInfo&& hostInfo
+    ) override {
+        if (hostInfo.on) {
+            diagnosticsSender.SendDiagnosticInformationFormatted(
+                1, "[%s] Now hosting %s (%zu viewers)",
+                hostInfo.hosting.c_str(),
+                hostInfo.beingHosted.c_str(),
+                hostInfo.viewers
+            );
+        } else {
+            diagnosticsSender.SendDiagnosticInformationFormatted(
+                1, "[%s] No longer hosting anyone",
+                hostInfo.hosting.c_str()
+            );
+        }
+    }
+
+    virtual void RoomModeChange(
+        Twitch::Messaging::RoomModeChangeInfo&& roomModeChangeInfo
+    ) override {
+        diagnosticsSender.SendDiagnosticInformationFormatted(
+            1, "[%s] Room mode %s: %d",
+            roomModeChangeInfo.channelName.c_str(),
+            roomModeChangeInfo.mode.c_str(),
+            roomModeChangeInfo.parameter
+        );
+    }
+
+    virtual void Clear(
+        Twitch::Messaging::ClearInfo&& clearInfo
+    ) {
+        switch (clearInfo.type) {
+            case Twitch::Messaging::ClearInfo::Type::ClearAll: {
+                diagnosticsSender.SendDiagnosticInformationFormatted(
+                    1, "[%s] ** CLEAR CHAT **",
+                    clearInfo.channel.c_str()
+                );
+            } break;
+
+            case Twitch::Messaging::ClearInfo::Type::ClearMessage: {
+                diagnosticsSender.SendDiagnosticInformationFormatted(
+                    1, "[%s] Message from %s has been deleted (was \"%s\")",
+                    clearInfo.channel.c_str(),
+                    clearInfo.user.c_str(),
+                    clearInfo.offendingMessageContent.c_str()
+                );
+            } break;
+
+            case Twitch::Messaging::ClearInfo::Type::Timeout: {
+                diagnosticsSender.SendDiagnosticInformationFormatted(
+                    1, "[%s] User %s has been timed out for %zu seconds; reason: %s",
+                    clearInfo.channel.c_str(),
+                    clearInfo.user.c_str(),
+                    clearInfo.duration,
+                    clearInfo.reason.c_str()
+                );
+            } break;
+
+            case Twitch::Messaging::ClearInfo::Type::Ban: {
+                diagnosticsSender.SendDiagnosticInformationFormatted(
+                    1, "[%s] User %s has been banned from the channel; reason: %s",
+                    clearInfo.channel.c_str(),
+                    clearInfo.user.c_str(),
+                    clearInfo.reason.c_str()
+                );
+            } break;
+
+            default: {
+                diagnosticsSender.SendDiagnosticInformationFormatted(
+                    SystemAbstractions::DiagnosticsSender::Levels::ERROR,
+                    "[%s] ** Unknown type of clear announcement **",
+                    clearInfo.channel.c_str()
+                );
+            } break;
+        }
+    }
+
+    virtual void Sub(
+        Twitch::Messaging::SubInfo&& subInfo
+    ) override {
+        switch (subInfo.type) {
+            case Twitch::Messaging::SubInfo::Type::Sub: {
+                diagnosticsSender.SendDiagnosticInformationFormatted(
+                    1, "[%s] SUB (new: %s) %s: %s [%s]",
+                    subInfo.channel.c_str(),
+                    subInfo.planName.c_str(),
+                    subInfo.user.c_str(),
+                    subInfo.systemMessage.c_str(),
+                    subInfo.userMessage.c_str()
+                );
+            } break;
+
+            case Twitch::Messaging::SubInfo::Type::Resub: {
+                diagnosticsSender.SendDiagnosticInformationFormatted(
+                    1, "[%s] SUB (renew %zu: %s) %s: %s [%s]",
+                    subInfo.channel.c_str(),
+                    subInfo.months,
+                    subInfo.planName.c_str(),
+                    subInfo.user.c_str(),
+                    subInfo.systemMessage.c_str(),
+                    subInfo.userMessage.c_str()
+                );
+            } break;
+
+            case Twitch::Messaging::SubInfo::Type::Gifted: {
+                diagnosticsSender.SendDiagnosticInformationFormatted(
+                    1, "[%s] SUB (gift from %s [%zu sent total]: %s) %s: %s [%s]",
+                    subInfo.channel.c_str(),
+                    subInfo.user.c_str(),
+                    subInfo.senderCount,
+                    subInfo.planName.c_str(),
+                    subInfo.recipientDisplayName.c_str(),
+                    subInfo.systemMessage.c_str(),
+                    subInfo.userMessage.c_str()
+                );
+            } break;
+
+            case Twitch::Messaging::SubInfo::Type::MysteryGift: {
+                diagnosticsSender.SendDiagnosticInformationFormatted(
+                    1, "[%s] SUB (mystery gift to %zu users from %s [%zu sent total]) %s [%s]",
+                    subInfo.channel.c_str(),
+                    subInfo.massGiftCount,
+                    subInfo.user.c_str(),
+                    subInfo.senderCount,
+                    subInfo.systemMessage.c_str(),
+                    subInfo.userMessage.c_str()
+                );
+            } break;
+
+            case Twitch::Messaging::SubInfo::Type::Unknown:
+            default: {
+                diagnosticsSender.SendDiagnosticInformationFormatted(
+                    SystemAbstractions::DiagnosticsSender::Levels::ERROR,
+                    "[%s] ** Unknown type of sub announcement **",
+                    subInfo.channel.c_str()
+                );
+            } break;
+        }
     }
 
 };
