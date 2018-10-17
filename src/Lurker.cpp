@@ -197,13 +197,13 @@ struct Lurker::Impl
     ) override {
         std::string userDisplayName;
         if (messageInfo.tags.displayName.empty()) {
-            userDisplayName = messageInfo.userName;
+            userDisplayName = messageInfo.user;
         } else {
             userDisplayName = messageInfo.tags.displayName;
         }
         diagnosticsSender.SendDiagnosticInformationFormatted(
             1, "[%s] %s: %s",
-            messageInfo.channelName.c_str(),
+            messageInfo.channel.c_str(),
             userDisplayName.c_str(),
             messageInfo.messageContent.c_str()
         );
