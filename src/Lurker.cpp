@@ -335,10 +335,15 @@ struct Lurker::Impl
     virtual void Sub(
         Twitch::Messaging::SubInfo&& subInfo
     ) override {
+        const auto timestamp = FormatTimestamp(
+            subInfo.tags.timestamp,
+            subInfo.tags.timeMilliseconds
+        );
         switch (subInfo.type) {
             case Twitch::Messaging::SubInfo::Type::Sub: {
                 diagnosticsSender.SendDiagnosticInformationFormatted(
-                    1, "[%s] SUB (new: %s) %s: %s [%s]",
+                    1, "[%s %s] SUB (new: %s) %s: %s [%s]",
+                    timestamp.c_str(),
                     subInfo.channel.c_str(),
                     subInfo.planName.c_str(),
                     subInfo.user.c_str(),
@@ -349,7 +354,8 @@ struct Lurker::Impl
 
             case Twitch::Messaging::SubInfo::Type::Resub: {
                 diagnosticsSender.SendDiagnosticInformationFormatted(
-                    1, "[%s] SUB (renew %zu: %s) %s: %s [%s]",
+                    1, "[%s %s] SUB (renew %zu: %s) %s: %s [%s]",
+                    timestamp.c_str(),
                     subInfo.channel.c_str(),
                     subInfo.months,
                     subInfo.planName.c_str(),
@@ -361,7 +367,8 @@ struct Lurker::Impl
 
             case Twitch::Messaging::SubInfo::Type::Gifted: {
                 diagnosticsSender.SendDiagnosticInformationFormatted(
-                    1, "[%s] SUB (gift from %s [%zu sent total]: %s) %s: %s [%s]",
+                    1, "[%s %s] SUB (gift from %s [%zu sent total]: %s) %s: %s [%s]",
+                    timestamp.c_str(),
                     subInfo.channel.c_str(),
                     subInfo.user.c_str(),
                     subInfo.senderCount,
@@ -374,7 +381,8 @@ struct Lurker::Impl
 
             case Twitch::Messaging::SubInfo::Type::MysteryGift: {
                 diagnosticsSender.SendDiagnosticInformationFormatted(
-                    1, "[%s] SUB (mystery gift to %zu users from %s [%zu sent total]) %s [%s]",
+                    1, "[%s %s] SUB (mystery gift to %zu users from %s [%zu sent total]) %s [%s]",
+                    timestamp.c_str(),
                     subInfo.channel.c_str(),
                     subInfo.massGiftCount,
                     subInfo.user.c_str(),
@@ -388,7 +396,8 @@ struct Lurker::Impl
             default: {
                 diagnosticsSender.SendDiagnosticInformationFormatted(
                     SystemAbstractions::DiagnosticsSender::Levels::ERROR,
-                    "[%s] ** Unknown type of sub announcement **",
+                    "[%s %s] ** Unknown type of sub announcement **",
+                    timestamp.c_str(),
                     subInfo.channel.c_str()
                 );
             } break;
