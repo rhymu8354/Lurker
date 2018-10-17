@@ -417,6 +417,23 @@ struct Lurker::Impl
         }
     }
 
+    virtual void Raid(
+        Twitch::Messaging::RaidInfo&& raidInfo
+    ) override {
+        const auto timestamp = FormatTimestamp(
+            raidInfo.tags.timestamp,
+            raidInfo.tags.timeMilliseconds
+        );
+        diagnosticsSender.SendDiagnosticInformationFormatted(
+            3, "[%s %s] RAID (%s: %zu viewers) %s",
+            timestamp.c_str(),
+            raidInfo.channel.c_str(),
+            raidInfo.raider.c_str(),
+            raidInfo.viewers,
+            raidInfo.systemMessage.c_str()
+        );
+    }
+
 };
 
 Lurker::~Lurker() noexcept = default;
