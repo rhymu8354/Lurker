@@ -139,7 +139,7 @@ int main(int argc, char* argv[]) {
     const auto previousInterruptHandler = signal(SIGINT, InterruptHandler);
     Environment environment;
     (void)setbuf(stdout, NULL);
-    const auto diagnosticsPublisher = SystemAbstractions::DiagnosticsStreamReporter(stderr, stderr);
+    const auto diagnosticsPublisher = SystemAbstractions::DiagnosticsStreamReporter(stdout, stderr);
     if (!ProcessCommandLineArguments(argc, argv, environment, diagnosticsPublisher)) {
         PrintUsageInformation();
         return EXIT_FAILURE;
