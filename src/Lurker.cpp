@@ -178,11 +178,11 @@ struct Lurker::Impl
     // Twitch::Messaging::User
 
     virtual void Doom() override {
-        diagnosticsSender.SendDiagnosticInformationString(2, "** SERVER DISCONNECT IMMINENT **");
+        diagnosticsSender.SendDiagnosticInformationString(4, "** SERVER DISCONNECT IMMINENT **");
     }
 
     virtual void LogIn() override {
-        diagnosticsSender.SendDiagnosticInformationString(1, "Logged in.");
+        diagnosticsSender.SendDiagnosticInformationString(4, "Logged in.");
         for (const auto& channel: channelsToJoin) {
             tmi.Join(channel);
         }
@@ -194,7 +194,7 @@ struct Lurker::Impl
             return;
         }
         StopWorker();
-        diagnosticsSender.SendDiagnosticInformationString(1, "Logged out.");
+        diagnosticsSender.SendDiagnosticInformationString(4, "Logged out.");
         std::lock_guard< decltype(mutex) > lock(mutex);
         loggedOut = true;
         mainThreadEvent.notify_one();
@@ -236,7 +236,7 @@ struct Lurker::Impl
             messageInfo.tags.timeMilliseconds
         );
         diagnosticsSender.SendDiagnosticInformationFormatted(
-            1, "[%s %s] %s: %s",
+            2, "[%s %s] %s: %s",
             timestamp.c_str(),
             messageInfo.channel.c_str(),
             userDisplayName.c_str(),
@@ -248,7 +248,7 @@ struct Lurker::Impl
         Twitch::Messaging::NoticeInfo&& noticeInfo
     ) override {
         diagnosticsSender.SendDiagnosticInformationFormatted(
-            1, "** Server NOTICE %s: %s **",
+            3, "** Server NOTICE %s: %s **",
             noticeInfo.id.c_str(),
             noticeInfo.message.c_str()
         );
@@ -259,14 +259,14 @@ struct Lurker::Impl
     ) override {
         if (hostInfo.on) {
             diagnosticsSender.SendDiagnosticInformationFormatted(
-                1, "[%s] Now hosting %s (%zu viewers)",
+                3, "[%s] Now hosting %s (%zu viewers)",
                 hostInfo.hosting.c_str(),
                 hostInfo.beingHosted.c_str(),
                 hostInfo.viewers
             );
         } else {
             diagnosticsSender.SendDiagnosticInformationFormatted(
-                1, "[%s] No longer hosting anyone",
+                3, "[%s] No longer hosting anyone",
                 hostInfo.hosting.c_str()
             );
         }
@@ -276,7 +276,7 @@ struct Lurker::Impl
         Twitch::Messaging::RoomModeChangeInfo&& roomModeChangeInfo
     ) override {
         diagnosticsSender.SendDiagnosticInformationFormatted(
-            1, "[%s] Room mode %s: %d",
+            2, "[%s] Room mode %s: %d",
             roomModeChangeInfo.channelName.c_str(),
             roomModeChangeInfo.mode.c_str(),
             roomModeChangeInfo.parameter
@@ -289,14 +289,14 @@ struct Lurker::Impl
         switch (clearInfo.type) {
             case Twitch::Messaging::ClearInfo::Type::ClearAll: {
                 diagnosticsSender.SendDiagnosticInformationFormatted(
-                    1, "[%s] ** CLEAR CHAT **",
+                    3, "[%s] ** CLEAR CHAT **",
                     clearInfo.channel.c_str()
                 );
             } break;
 
             case Twitch::Messaging::ClearInfo::Type::ClearMessage: {
                 diagnosticsSender.SendDiagnosticInformationFormatted(
-                    1, "[%s] Message from %s has been deleted (was \"%s\")",
+                    3, "[%s] Message from %s has been deleted (was \"%s\")",
                     clearInfo.channel.c_str(),
                     clearInfo.user.c_str(),
                     clearInfo.offendingMessageContent.c_str()
@@ -305,7 +305,7 @@ struct Lurker::Impl
 
             case Twitch::Messaging::ClearInfo::Type::Timeout: {
                 diagnosticsSender.SendDiagnosticInformationFormatted(
-                    1, "[%s] User %s has been timed out for %zu seconds; reason: %s",
+                    3, "[%s] User %s has been timed out for %zu seconds; reason: %s",
                     clearInfo.channel.c_str(),
                     clearInfo.user.c_str(),
                     clearInfo.duration,
@@ -315,7 +315,7 @@ struct Lurker::Impl
 
             case Twitch::Messaging::ClearInfo::Type::Ban: {
                 diagnosticsSender.SendDiagnosticInformationFormatted(
-                    1, "[%s] User %s has been banned from the channel; reason: %s",
+                    3, "[%s] User %s has been banned from the channel; reason: %s",
                     clearInfo.channel.c_str(),
                     clearInfo.user.c_str(),
                     clearInfo.reason.c_str()
@@ -342,7 +342,7 @@ struct Lurker::Impl
         switch (subInfo.type) {
             case Twitch::Messaging::SubInfo::Type::Sub: {
                 diagnosticsSender.SendDiagnosticInformationFormatted(
-                    1, "[%s %s] SUB (new: %s) %s: %s [%s]",
+                    3, "[%s %s] SUB (new: %s) %s: %s [%s]",
                     timestamp.c_str(),
                     subInfo.channel.c_str(),
                     subInfo.planName.c_str(),
@@ -354,7 +354,7 @@ struct Lurker::Impl
 
             case Twitch::Messaging::SubInfo::Type::Resub: {
                 diagnosticsSender.SendDiagnosticInformationFormatted(
-                    1, "[%s %s] SUB (renew %zu: %s) %s: %s [%s]",
+                    3, "[%s %s] SUB (renew %zu: %s) %s: %s [%s]",
                     timestamp.c_str(),
                     subInfo.channel.c_str(),
                     subInfo.months,
@@ -367,7 +367,7 @@ struct Lurker::Impl
 
             case Twitch::Messaging::SubInfo::Type::Gifted: {
                 diagnosticsSender.SendDiagnosticInformationFormatted(
-                    1, "[%s %s] SUB (gift from %s [%zu sent total]: %s) %s: %s [%s]",
+                    3, "[%s %s] SUB (gift from %s [%zu sent total]: %s) %s: %s [%s]",
                     timestamp.c_str(),
                     subInfo.channel.c_str(),
                     subInfo.user.c_str(),
@@ -381,7 +381,7 @@ struct Lurker::Impl
 
             case Twitch::Messaging::SubInfo::Type::MysteryGift: {
                 diagnosticsSender.SendDiagnosticInformationFormatted(
-                    1, "[%s %s] SUB (mystery gift to %zu users from %s [%zu sent total]) %s [%s]",
+                    3, "[%s %s] SUB (mystery gift to %zu users from %s [%zu sent total]) %s [%s]",
                     timestamp.c_str(),
                     subInfo.channel.c_str(),
                     subInfo.massGiftCount,
