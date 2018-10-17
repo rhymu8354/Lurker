@@ -195,10 +195,16 @@ struct Lurker::Impl
     virtual void Message(
         Twitch::Messaging::MessageInfo&& messageInfo
     ) override {
+        std::string userDisplayName;
+        if (messageInfo.tags.displayName.empty()) {
+            userDisplayName = messageInfo.userName;
+        } else {
+            userDisplayName = messageInfo.tags.displayName;
+        }
         diagnosticsSender.SendDiagnosticInformationFormatted(
             1, "[%s] %s: %s",
             messageInfo.channelName.c_str(),
-            messageInfo.userName.c_str(),
+            userDisplayName.c_str(),
             messageInfo.messageContent.c_str()
         );
     }
