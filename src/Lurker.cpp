@@ -20,6 +20,7 @@
 #include <SystemAbstractions/File.hpp>
 #include <SystemAbstractions/StringExtensions.hpp>
 #include <thread>
+#include <time.h>
 #include <Twitch/Messaging.hpp>
 #include <TwitchNetworkTransport/Connection.hpp>
 
@@ -30,6 +31,31 @@ namespace {
      * in the worker thread of the chat room.
      */
     constexpr unsigned int WORKER_POLLING_PERIOD_MILLISECONDS = 50;
+
+    /**
+     * This function constructs a human-readable timestamp from the given time
+     * information.
+     *
+     * @param[in] time
+     *     This is the time in seconds since the UNIX epoch.
+     *
+     * @param[in] milliseconds
+     *     This is a fractional number of milliseconds of
+     *     the time past the given number of seconds.
+     *
+     * @return
+     *     A human-readable timestamp constructed from the given time
+     *     information is returned.
+     */
+    std::string FormatTimestamp(
+        time_t time,
+        unsigned int milliseconds
+    ) {
+        char buffer[13];
+        (void)strftime(buffer, sizeof(buffer), "%T", localtime(&time));
+        (void)sprintf(buffer + 8, ".%03u", milliseconds);
+        return buffer;
+    }
 
 }
 
@@ -201,8 +227,13 @@ struct Lurker::Impl
         } else {
             userDisplayName = messageInfo.tags.displayName;
         }
+        const auto timestamp = FormatTimestamp(
+            messageInfo.tags.timestamp,
+            messageInfo.tags.timeMilliseconds
+        );
         diagnosticsSender.SendDiagnosticInformationFormatted(
-            1, "[%s] %s: %s",
+            1, "[%s %s] %s: %s",
+            timestamp.c_str(),
             messageInfo.channel.c_str(),
             userDisplayName.c_str(),
             messageInfo.messageContent.c_str()
