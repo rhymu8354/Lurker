@@ -197,9 +197,9 @@ struct Lurker::Impl
     ) override {
         diagnosticsSender.SendDiagnosticInformationFormatted(
             1, "[%s] %s: %s",
-            messageInfo.channel.c_str(),
-            messageInfo.user.c_str(),
-            messageInfo.message.c_str()
+            messageInfo.channelName.c_str(),
+            messageInfo.userName.c_str(),
+            messageInfo.messageContent.c_str()
         );
     }
 
