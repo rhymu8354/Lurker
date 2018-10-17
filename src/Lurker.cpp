@@ -286,6 +286,10 @@ struct Lurker::Impl
     virtual void Clear(
         Twitch::Messaging::ClearInfo&& clearInfo
     ) {
+        std::string reason;
+        if (!clearInfo.reason.empty()) {
+            reason = "; reason: " + clearInfo.reason;
+        }
         switch (clearInfo.type) {
             case Twitch::Messaging::ClearInfo::Type::ClearAll: {
                 diagnosticsSender.SendDiagnosticInformationFormatted(
@@ -305,20 +309,20 @@ struct Lurker::Impl
 
             case Twitch::Messaging::ClearInfo::Type::Timeout: {
                 diagnosticsSender.SendDiagnosticInformationFormatted(
-                    3, "[%s] User %s has been timed out for %zu seconds; reason: %s",
+                    3, "[%s] User %s has been timed out for %zu seconds%s",
                     clearInfo.channel.c_str(),
                     clearInfo.user.c_str(),
                     clearInfo.duration,
-                    clearInfo.reason.c_str()
+                    reason.c_str()
                 );
             } break;
 
             case Twitch::Messaging::ClearInfo::Type::Ban: {
                 diagnosticsSender.SendDiagnosticInformationFormatted(
-                    3, "[%s] User %s has been banned from the channel; reason: %s",
+                    3, "[%s] User %s has been banned from the channel%s",
                     clearInfo.channel.c_str(),
                     clearInfo.user.c_str(),
-                    clearInfo.reason.c_str()
+                    reason.c_str()
                 );
             } break;
 
