@@ -443,6 +443,22 @@ struct Lurker::Impl
         );
     }
 
+    virtual void Ritual(
+        Twitch::Messaging::RitualInfo&& ritualInfo
+    ) override {
+        const auto timestamp = FormatTimestamp(
+            ritualInfo.tags.timestamp,
+            ritualInfo.tags.timeMilliseconds
+        );
+        diagnosticsSender.SendDiagnosticInformationFormatted(
+            3, "[%s %s] RITUAL %s (%s) %s",
+            timestamp.c_str(),
+            ritualInfo.channel.c_str(),
+            ritualInfo.ritual.c_str(),
+            ritualInfo.user.c_str(),
+            ritualInfo.systemMessage.c_str()
+        );
+    }
 };
 
 Lurker::~Lurker() noexcept = default;
