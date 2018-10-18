@@ -231,15 +231,22 @@ struct Lurker::Impl
         } else {
             userDisplayName = messageInfo.tags.displayName;
         }
+        size_t level = 2;
+        std::string bits;
+        if (messageInfo.bits > 0) {
+            level = 3;
+            bits = SystemAbstractions::sprintf(" (%zu bits)", messageInfo.bits);
+        }
         const auto timestamp = FormatTimestamp(
             messageInfo.tags.timestamp,
             messageInfo.tags.timeMilliseconds
         );
         diagnosticsSender.SendDiagnosticInformationFormatted(
-            2, "[%s %s] %s: %s",
+            level, "[%s %s] %s%s: %s",
             timestamp.c_str(),
             messageInfo.channel.c_str(),
             userDisplayName.c_str(),
+            bits.c_str(),
             messageInfo.messageContent.c_str()
         );
     }
