@@ -295,6 +295,10 @@ struct Lurker::Impl
     virtual void Clear(
         Twitch::Messaging::ClearInfo&& clearInfo
     ) {
+        const auto timestamp = FormatTimestamp(
+            clearInfo.tags.timestamp,
+            clearInfo.tags.timeMilliseconds
+        );
         std::string reason;
         if (!clearInfo.reason.empty()) {
             reason = "; reason: " + clearInfo.reason;
@@ -302,14 +306,16 @@ struct Lurker::Impl
         switch (clearInfo.type) {
             case Twitch::Messaging::ClearInfo::Type::ClearAll: {
                 diagnosticsSender.SendDiagnosticInformationFormatted(
-                    3, "[%s] ** CLEAR CHAT **",
+                    3, "[%s %s] ** CLEAR CHAT **",
+                    timestamp.c_str(),
                     clearInfo.channel.c_str()
                 );
             } break;
 
             case Twitch::Messaging::ClearInfo::Type::ClearMessage: {
                 diagnosticsSender.SendDiagnosticInformationFormatted(
-                    3, "[%s] Message from %s has been deleted (was \"%s\")",
+                    3, "[%s %s] Message from %s has been deleted (was \"%s\")",
+                    timestamp.c_str(),
                     clearInfo.channel.c_str(),
                     clearInfo.user.c_str(),
                     clearInfo.offendingMessageContent.c_str()
@@ -318,7 +324,8 @@ struct Lurker::Impl
 
             case Twitch::Messaging::ClearInfo::Type::Timeout: {
                 diagnosticsSender.SendDiagnosticInformationFormatted(
-                    3, "[%s] User %s has been timed out for %zu seconds%s",
+                    3, "[%s %s] User %s has been timed out for %zu seconds%s",
+                    timestamp.c_str(),
                     clearInfo.channel.c_str(),
                     clearInfo.user.c_str(),
                     clearInfo.duration,
@@ -328,7 +335,8 @@ struct Lurker::Impl
 
             case Twitch::Messaging::ClearInfo::Type::Ban: {
                 diagnosticsSender.SendDiagnosticInformationFormatted(
-                    3, "[%s] User %s has been banned from the channel%s",
+                    3, "[%s %s] User %s has been banned from the channel%s",
+                    timestamp.c_str(),
                     clearInfo.channel.c_str(),
                     clearInfo.user.c_str(),
                     reason.c_str()
@@ -338,7 +346,8 @@ struct Lurker::Impl
             default: {
                 diagnosticsSender.SendDiagnosticInformationFormatted(
                     SystemAbstractions::DiagnosticsSender::Levels::ERROR,
-                    "[%s] ** Unknown type of clear announcement **",
+                    "[%s %s] ** Unknown type of clear announcement **",
+                    timestamp.c_str(),
                     clearInfo.channel.c_str()
                 );
             } break;
