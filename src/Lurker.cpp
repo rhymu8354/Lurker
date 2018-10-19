@@ -241,14 +241,25 @@ struct Lurker::Impl
             messageInfo.tags.timestamp,
             messageInfo.tags.timeMilliseconds
         );
-        diagnosticsSender.SendDiagnosticInformationFormatted(
-            level, "[%s %s] %s%s: %s",
-            timestamp.c_str(),
-            messageInfo.channel.c_str(),
-            userDisplayName.c_str(),
-            bits.c_str(),
-            messageInfo.messageContent.c_str()
-        );
+        if (messageInfo.isAction) {
+            diagnosticsSender.SendDiagnosticInformationFormatted(
+                level, "[%s %s] ** %s%s%s **",
+                timestamp.c_str(),
+                messageInfo.channel.c_str(),
+                userDisplayName.c_str(),
+                bits.c_str(),
+                messageInfo.messageContent.c_str()
+            );
+        } else {
+            diagnosticsSender.SendDiagnosticInformationFormatted(
+                level, "[%s %s] %s%s: %s",
+                timestamp.c_str(),
+                messageInfo.channel.c_str(),
+                userDisplayName.c_str(),
+                bits.c_str(),
+                messageInfo.messageContent.c_str()
+            );
+        }
     }
 
     virtual void Notice(
