@@ -312,7 +312,7 @@ struct Lurker::Impl
 
     virtual void Clear(
         Twitch::Messaging::ClearInfo&& clearInfo
-    ) {
+    ) override {
         const auto timestamp = FormatTimestamp(
             clearInfo.tags.timestamp,
             clearInfo.tags.timeMilliseconds
