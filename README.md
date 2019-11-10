@@ -37,6 +37,9 @@ There are two distinct steps in the build process:
 * [TwitchNetworkTransport](https://github.com:rhymu8354/TwitchNetworkTransport.git) - an adapter to provide the `Twitch` library with the network connection facilities from `SystemAbstractions`
 * [TlsDecorator](https://github.com/rhymu8354/TlsDecorator.git) - an adapter to use `LibreSSL` to encrypt traffic passing through a network connection provided by `SystemAbstractions`
 * [LibreSSL](https://www.libressl.org/) (`libtls`, `libssl`, and `libcrypto`) - an implementation of the Secure Sockets Layer (SSL) and Transport Layer Security (TLS) protocols
+* [StringExtensions](https://github.com/rhymu8354/StringExtensions.git) - a
+  library containing C++ string-oriented libraries, many of which ought to be
+  in the standard library, but aren't.
 * [SystemAbstractions](https://github.com/rhymu8354/SystemAbstractions.git) - a cross-platform adapter library for system services whose APIs vary from one operating system to another
 
 ### Build system generation

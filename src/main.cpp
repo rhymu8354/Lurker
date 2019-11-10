@@ -16,8 +16,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
+#include <StringExtensions/StringExtensions.hpp>
 #include <SystemAbstractions/DiagnosticsStreamReporter.hpp>
-#include <SystemAbstractions/StringExtensions.hpp>
 #include <thread>
 
 namespace {

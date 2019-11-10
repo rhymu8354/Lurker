@@ -16,9 +16,9 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <StringExtensions/StringExtensions.hpp>
 #include <SystemAbstractions/DiagnosticsSender.hpp>
 #include <SystemAbstractions/File.hpp>
-#include <SystemAbstractions/StringExtensions.hpp>
 #include <thread>
 #include <time.h>
 #include <Twitch/Messaging.hpp>
@@ -235,7 +235,7 @@ struct Lurker::Impl
         std::string bits;
         if (messageInfo.bits > 0) {
             level = 3;
-            bits = SystemAbstractions::sprintf(" (%zu bits)", messageInfo.bits);
+            bits = StringExtensions::sprintf(" (%zu bits)", messageInfo.bits);
         }
         const auto timestamp = FormatTimestamp(
             messageInfo.tags.timestamp,
@@ -503,7 +503,7 @@ void Lurker::Configure(
                 diagnosticMessageDelegate(
                     "Lurker",
                     SystemAbstractions::DiagnosticsSender::Levels::ERROR,
-                    SystemAbstractions::sprintf(
+                    StringExtensions::sprintf(
                         "unable to open root CA certificates file '%s'",
                         caCertsFile.GetPath().c_str()
                     )
