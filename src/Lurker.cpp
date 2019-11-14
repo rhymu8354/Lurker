@@ -499,7 +499,7 @@ void Lurker::Configure(
                 SystemAbstractions::File::GetExeParentDirectory()
                 + "/cert.pem"
             );
-            if (!caCertsFile.Open()) {
+            if (!caCertsFile.OpenReadOnly()) {
                 diagnosticMessageDelegate(
                     "Lurker",
                     SystemAbstractions::DiagnosticsSender::Levels::ERROR,
